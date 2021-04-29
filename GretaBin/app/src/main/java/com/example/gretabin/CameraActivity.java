@@ -1,17 +1,14 @@
 package com.example.gretabin;
 
 import android.annotation.SuppressLint;
-import android.media.Image;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.OrientationEventListener;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.annotation.Size;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
@@ -22,9 +19,7 @@ import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.example.gretabin.API.APIActivity;
 import com.google.android.gms.tasks.Task;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.barcode.Barcode;
@@ -32,11 +27,10 @@ import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.common.InputImage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class CameraActivity extends AppCompatActivity {
+public class CameraActivity extends AppCompatActivity{
     private PreviewView previewView;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private TextView textView;
@@ -89,6 +83,10 @@ public class CameraActivity extends AppCompatActivity {
                 .addOnSuccessListener(barcodes -> {
                     for (Barcode barcode: barcodes) {
                         textView.setText(barcode.getRawValue());
+                        Intent intent = new Intent(this, APIActivity.class);
+                        //This feeds in all the info we have so far about the barcode and image.
+                        //startActivity(intent);
+                        startActivity(intent.putExtra("Barcode + Image",barcode.getRawValue()));
                     }
                 })
                 .addOnFailureListener(e -> textView.setText("Not able to read Barcode"))

@@ -22,12 +22,12 @@
             android:text="No Barcode Detected"
             android:textSize="20sp"
             android:textColor="#9999ff"/>
-        <Button
-            android:id="@+id/recycleAction"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center"
-            android:text="Can I Recycle This?" />
+<!--        <Button-->
+<!--            android:id="@+id/recycleAction"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="bottom|center"-->
+<!--            android:text="Can I Recycle This?" />-->
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

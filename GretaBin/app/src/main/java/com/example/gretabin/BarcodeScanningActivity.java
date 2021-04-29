@@ -1,75 +1,60 @@
 package com.example.gretabin;
 
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.SurfaceView;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.vision.CameraSource;
-import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.google.mlkit.vision.barcode.Barcode;
-import com.google.mlkit.vision.barcode.BarcodeScanner;
-import com.google.mlkit.vision.barcode.BarcodeScanning;
-import com.google.mlkit.vision.common.InputImage;
+import com.example.gretabin.API.ApiResult;
 
-import java.util.List;
 
 public class BarcodeScanningActivity extends AppCompatActivity {
-    SurfaceView surfaceView;
-    TextView txtBarcodeValue;
-    Button btnAction;
-    private BarcodeDetector barcodeDetector;
-    private CameraSource cameraSource;
+    private RecycledResult recycledResult;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.scanned_barcode);
-        txtBarcodeValue = findViewById(R.id.txtBarcodeValue);
-        surfaceView = findViewById(R.id.surfaceView);
-        /*This defines what is done when the button is clicked*/
-        btnAction = findViewById(R.id.btnAction);
-        btnAction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
+        recycledResult = new RecycledResult.RecycledResultBuilder()
+                .product(findViewById(R.id.product))
+                .recycledOutcome(findViewById(R.id.Recyclabe))
+                .outcomeGif(findViewById(R.id.imageView))
+                .productMaterial(findViewById(R.id.packaging_material_input))
+                .productType(findViewById(R.id.product_type_entry))
+                .productScore(findViewById(R.id.material_score_input))
+                .scanNew(findViewById(R.id.button))
+                .build();
+
+        populatePage(getIntent().getParcelableExtra("Retrieved Info"));
+
+        recycledResult.scanNew.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
+
+    }
+
+
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        private void populatePage (ApiResult apiResult){
+            recycledResult.product.setText((CharSequence) apiResult.getProduct());
+
+            double productScore = apiResult.getProductScore();
+            if (productScore > 0) {
+                recycledResult.recycledOutcome.setText("Recyclable");
+                recycledResult.recycledOutcome.setTextColor(Color.parseColor("#42f56c"));
+                recycledResult.outcomeGif.setImageResource(R.drawable.recycle);
+            } else {
+                recycledResult.recycledOutcome.setText("Not Recyclable");
+                recycledResult.recycledOutcome.setTextColor(Color.parseColor("#eb3434"));
+                recycledResult.outcomeGif.setImageResource(R.drawable.trash);
             }
-        });
-    }
 
-    private void scanBarcodes(InputImage image){
-        // [START get_detector]
-        BarcodeScanner scanner = BarcodeScanning.getClient();
-        // [END get_detector]
+            recycledResult.productType.setText((CharSequence) apiResult.getProductType());
+            recycledResult.productMaterial.setText((CharSequence) apiResult.getProductMaterial());
+            recycledResult.productScore.setText(String.valueOf(productScore));
+        }
 
-        // [START run_detector]
-        Task<List<Barcode>> result = scanner.process(image)
-                .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
-                    @Override
-                    public void onSuccess(List<Barcode> barcodes) {
-                        // Task completed successfully
-                        // [START_EXCLUDE]
-                        // [START get_barcodes]
-                        for (Barcode barcode: barcodes) {
-                            barcode.getRawValue();
-                        }
-                        // [END get_barcodes]
-                        // [END_EXCLUDE]
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        txtBarcodeValue.setText("Not able to read Barcode");
-                    }
-                });
-        // [END run_detector]
     }
-}
